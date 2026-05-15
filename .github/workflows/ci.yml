@@ -27,17 +27,31 @@ jobs:
           php-version: 8.2
           coverage: xdebug
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Copy CI environment
         run: cp .env.ci .env
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Build frontend assets
+        run: npm run build
 
       - name: Generate application key
         run: php artisan key:generate
 
+      - name: Create SQLite database
+        run: touch database/database.sqlite
+
       - name: Run migrations
-        run: php artisan migrate
+        run: php artisan migrate --force
 
       - name: Run tests with coverage
         run: php artisan test --coverage --min=50
@@ -54,6 +68,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Simulate DEV deploy
         run: |
           cp .env.dev .env
@@ -65,6 +82,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Simulate UAT deploy
         run: |
           cp .env.uat .env
@@ -76,6 +96,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Simulate PROD deploy
         run: |
           cp .env.prod .env
