@@ -1,0 +1,82 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+      - uat
+      - main
+
+  pull_request:
+    branches:
+      - develop
+      - uat
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          coverage: xdebug
+
+      - name: Copy CI environment
+        run: cp .env.ci .env
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate
+
+      - name: Run tests with coverage
+        run: php artisan test --coverage --min=50
+
+      - name: Run PHPStan
+        run: php ./vendor/bin/phpstan analyse
+
+      - name: Run Pint
+        run: php ./vendor/bin/pint --test
+
+  deploy-dev:
+    if: github.ref == 'refs/heads/develop'
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simulate DEV deploy
+        run: |
+          cp .env.dev .env
+          echo "Deploying to DEV with .env.dev"
+
+  deploy-uat:
+    if: github.ref == 'refs/heads/uat'
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simulate UAT deploy
+        run: |
+          cp .env.uat .env
+          echo "Deploying to UAT with .env.uat"
+
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simulate PROD deploy
+        run: |
+          cp .env.prod .env
+          echo "Deploying to PROD with .env.prod"

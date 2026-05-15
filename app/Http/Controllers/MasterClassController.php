@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\MasterClass;
 use App\Models\Category;
+use App\Models\MasterClass;
+use Illuminate\Http\Request;
 
 class MasterClassController extends Controller
 {
@@ -56,7 +56,7 @@ class MasterClassController extends Controller
 
         $allowedTimes = ['09:00', '11:00', '13:00', '15:00'];
 
-        if (!in_array($request->time, $allowedTimes)) {
+        if (! in_array($request->time, $allowedTimes)) {
             return back()->withErrors(['time' => 'Недопустимое время'])->withInput();
         }
 
@@ -115,7 +115,7 @@ class MasterClassController extends Controller
 
         $allowedTimes = ['09:00', '11:00', '13:00', '15:00'];
 
-        if (!in_array($request->time, $allowedTimes)) {
+        if (! in_array($request->time, $allowedTimes)) {
             return back()->withErrors(['time' => 'Недопустимое время'])->withInput();
         }
 

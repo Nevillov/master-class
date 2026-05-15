@@ -1,0 +1,11 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    excludePaths:
+        - app/Http/Controllers/Auth/VerifyEmailController.php
+
+    level: 5
